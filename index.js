@@ -2,7 +2,13 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  ],
+});
 
 client.commands = new Collection();
 const commandFiles = fs
@@ -26,10 +32,6 @@ for (const file of eventFiles) {
   }
 }
 
-client.once('ready', () => {
-  console.log('Ready!');
-});
-
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
@@ -45,6 +47,14 @@ client.on('interactionCreate', async (interaction) => {
       content: 'There was an error while executing this command!',
       ephemeral: true,
     });
+  }
+});
+
+client.on('messageCreate', (message) => {
+  if (message.content.includes('kirby') && !message.author.bot) {
+    console.log('kirby found.');
+    // message.channel.send(`Kirby found.`);
+    message.react('👍');
   }
 });
 
